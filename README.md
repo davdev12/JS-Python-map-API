@@ -10,5 +10,6 @@ And for the route calculation we use the pathfinding module, especially the A* a
 
 <h2>Grid/matrix</h2>
 To calculate the best possible route for our moving object pathfinding requires a special grid or matrix
-<img width="285" height="118" alt="Bildschirmfoto 2026-05-27 um 00 44 11" src="https://github.com/user-attachments/assets/e1a19403-a7ee-4606-a207-d601d6aa0357" />
+<img width="407" height="287" alt="Bildschirmfoto 2026-05-27 um 01 01 35" src="https://github.com/user-attachments/assets/ffa8aa59-6b3d-4f3c-98dc-75b82f5decae" />
+
 It depicts our map in a for pathfinding relevant form: 1 are dots where the object CAN move, 2 dots that act as obstacles, like walls, or other boundaries .
