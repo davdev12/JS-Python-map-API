@@ -1,5 +1,7 @@
 import flask
 import time
+import socket
+import json
 from flask import request
 from flask_cors import CORS
 
@@ -19,7 +21,7 @@ import numpy as np
 
 app = flask.Flask(__name__)
 CORS(app)
-
+received_values = []
 # ─────────────────────────────────────
 # YOLO MODEL
 # ─────────────────────────────────────
@@ -37,8 +39,9 @@ CAM_URL = "http://192.168.0.219/capture"
 # ─────────────────────────────────────
 # AUTO CAR
 # ─────────────────────────────────────
-
-CAR_IP = "192.168.0.50"
+CAM_IP = "192.168.0.219"
+arduino_ip = "192.168.0.73"
+arduino_port = 1234
 
 # ─────────────────────────────────────
 # GRID
@@ -70,7 +73,8 @@ matrix = [
 # ─────────────────────────────────────
 
 last_good_frame = None
-
+"""client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+client_socket.connect((arduino_ip, arduino_port))"""
 # ─────────────────────────────────────
 # ESP32 FRAME HOLEN
 # ─────────────────────────────────────
@@ -116,7 +120,7 @@ def get_frame():
 # AUTO CAR REQUEST
 # ─────────────────────────────────────
 
-def send_car_command(command):
+"""def send_car_command(command):
 
     try:
 
@@ -130,7 +134,7 @@ def send_car_command(command):
     except Exception as e:
 
         print("CAR ERROR:", e)
-
+"""
 # ─────────────────────────────────────
 # YOLO LOOP
 # ─────────────────────────────────────
@@ -161,7 +165,7 @@ def yolo_loop():
                 if frame is not None:
 
                     # OPTIONAL ROTATION
-                    # frame = cv2.rotate(frame, cv2.ROTATE_180)
+                    frame = cv2.rotate(frame, cv2.ROTATE_180)
 
                     try:
 
@@ -187,8 +191,8 @@ def yolo_loop():
 
                             print("CENTER X:", center_x)
 
-                            command = "FORWARD"
-
+                            command = "GO"
+                            print("GO")
                             # AUTO STEUERUNG
                             if center_x < 220:
 
@@ -201,13 +205,13 @@ def yolo_loop():
                             else:
 
                                 command = "FORWARD"
-
+                            client_socket.sendall(command + "\n".encode())
                             # Nur senden wenn neuer Command
-                            if command != last_command:
+                            #if command != last_command:
 
-                                send_car_command(command)
+                            #send_car_command(command)
 
-                                last_command = command
+                            #last_command = command
 
                         # Keine Detection
                         if not detected:
@@ -219,7 +223,7 @@ def yolo_loop():
 
                                 if last_command != "STOP":
 
-                                    send_car_command("STOP")
+                                    #send_car_command("STOP")
 
                                     last_command = "STOP"
 
@@ -227,6 +231,22 @@ def yolo_loop():
 
                             no_detection_counter = 0
 
+
+
+                        """while True:
+                            # Daten vom Arduino empfangen
+                            response = client_socket.recv(1024).decode().strip()
+
+                            if response:  # Falls eine Antwort empfangen wurde
+                                try:
+
+                                    value = str(response)  # Versuche, die Antwort in einn String umzuwandeln
+                                    received_values.append(value)  # Wert in die Liste speichern
+                                    print(f"Empfangen und gespeichert: {value}")
+                                    if (1 == 1):
+                                        image_path = capture_image(url)
+                                        if image_path:
+                                            classify_image(image_path)"""
                     except Exception as e:
 
                         print("YOLO ERROR:", e)
